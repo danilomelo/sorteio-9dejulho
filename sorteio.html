@@ -6,10 +6,6 @@
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-	<!-- Optional theme -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
-	<!-- Latest compiled and minified JavaScript -->
 
 	<style>
 
@@ -35,7 +31,6 @@
 
 		button,
 		label{
-			width: 200px;
 			margin: 5px;
 		}
 
@@ -124,13 +119,14 @@
 									</select>
 								</div>
 								<div class="form-group">
-									<button id="bt">GRAVAR</button>
+									<button id="bt">CADASTRAR</button>
 								</div>
 							</div>
 						</div>	
 					</div>
-				</div>
-				
+				</div> <!-- /well -->
+				<button class="btn btn-primary" onclick="getLocalStorage('candidatos')">Pegar backup candidatos</button>
+				<button class="btn btn-primary" onclick="getLocalStorage('sorteados')">Pegar backup sorteados</button>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="tab">
 				<div class="well">
@@ -191,17 +187,17 @@
 			var random = Math.floor(Math.random() * candidatos.length);
 			var sorteado = candidatos[random];
 
-			if (!sorteado) {
-				console.log('Não há mais nomes para serem sorteados');
-
+			if (!candidatos.length) {
+				alert('Não há mais nomes para serem sorteados');
+				return;
 			}else if (sorteado.sorteado) {
-				sortear();
+				return sortear();
 			}
 
 			mostrarSorteado(sorteado);
 			gravaSorteado(sorteado);
-			candidatos.splice(0, random);
-			saveLocalStorage(candidatos);
+			saveLocalStorage('candidatos', candidatos);
+			saveLocalStorage('sorteados', sorteados);
 		}
 
 
@@ -211,18 +207,23 @@
 			console.log('gravando sorteado', sorteado);
 
 			sorteados.push(sorteado);
+			retiraSorteadoDosCandidatos(sorteado);
+		}
 
+		function retiraSorteadoDosCandidatos(sorteado){
 			candidatos.forEach(function(v, k){
-				if (sorteado.endereco === v.endereco && sorteado.n_casa === v.n_casa) {
+				if (sorteado.nome == v.nome) {
+					candidatos.splice(k, 1);
+					console.log("Retira o sorteado da lista de candidatos");
+				}
+				if (sorteado.endereco === v.endereco && sorteado.n_casa === v.n_casa && v.nome != sorteado.nome) {
 					v.sorteado = true;
-					console.log('encontradas pessoas da mesma casa', v);
-					candidatos.splice(0, k);
+					console.log('Encontradas pessoas da mesma casa', v);
+					candidatos.splice(k, 1);
 				}
 			});
 		}
 
-		// Pode ser usado no type para saber se já foi cadastro o nome;
-		// Pode ser usado para debug
 		function findPerson(nome) {
 			var pessoa = candidatos.filter(function(p){return p.nome == nome;})
 			if (pessoa.length) {
@@ -239,9 +240,15 @@
 			sorteado_end.append(' '+ sorteado.n_casa);
 		}
 
-		function saveLocalStorage(data){
-			localStorage.setItem('candidatos', JSON.stringify(data));
+		function saveLocalStorage(name, data){
+			localStorage.setItem(name, JSON.stringify(data));
 		}	
+
+		function getLocalStorage(name){
+			window[name] = JSON.parse(localStorage.getItem(name));
+			alert(name += ' foram atualizados');
+		}
+
 	</script>
 
 </body>
