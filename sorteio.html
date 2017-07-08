@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>Document</title>
+	<title>Sorteio</title>
 	<!-- Latest compiled and minified CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -106,7 +106,7 @@
 								</div>
 								<div class="form-group">
 									<label for=""> Endereco: </label>
-									<input type="text" id="end" class="input-sm form-control">
+									<input type="text" id="end" class="input-sm form-control" placeholder="Ex: Rua X">
 								</div>
 								<div class="form-group">
 									<label for=""> N da casa: </label>
@@ -172,6 +172,8 @@
 				sorteado: false
 			});
 
+			saveLocalStorage(candidatos);
+
 			nome.val('');
 			end.val('');
 			n_casa.val('');
@@ -198,8 +200,8 @@
 
 			mostrarSorteado(sorteado);
 			gravaSorteado(sorteado);
-
 			candidatos.splice(0, random);
+			saveLocalStorage(candidatos);
 		}
 
 
@@ -217,8 +219,6 @@
 					candidatos.splice(0, k);
 				}
 			});
-
-			$('#nome').focus();
 		}
 
 		// Pode ser usado no type para saber se já foi cadastro o nome;
@@ -239,7 +239,9 @@
 			sorteado_end.append(' '+ sorteado.n_casa);
 		}
 
-		
+		function saveLocalStorage(data){
+			localStorage.setItem('candidatos', JSON.stringify(data));
+		}	
 	</script>
 
 </body>
