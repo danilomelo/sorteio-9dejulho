@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+	<!-- Latest compiled and minified JavaScript -->
+
+	<style>
+
+		body{
+			font-family: Arial;
+		}
+		
+		h1{
+			text-align: center;
+
+		}
+		
+		button{
+			border: none;
+			padding: 10px;
+			background: #4de06e;
+			font-weight: bold;
+			text-align: center;
+			color: white;
+			min-width: 200px;
+			border-radius: 4px;
+		}
+
+		button,
+		label{
+			width: 200px;
+			margin: 5px;
+		}
+
+		label{
+			display: block;
+		}
+
+		input{
+			display: block;
+			width: 100%;
+			border: 1px solid #ccc;
+			height: 30px;
+			border-radius: 4px;
+		}
+
+		button{
+			box-shadow: 1px 1px 2px #ccc;
+			text-transform: uppercase;
+		}	
+		.sorteado{
+			margin-top: 100px;
+			text-align: center;
+		}
+		
+		.sorteado-info{
+			height: 300px;					
+		}
+		
+		#bt{
+			display: block;
+		}
+		
+		#setor{
+			height: 30px;
+			width: 200px;
+		}
+
+		#sortear{
+			font-size: 20px;
+		}	
+	</style>
+
+</head>
+<body>
+	<div role="tabpanel">
+		<!-- Nav tabs -->
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" class="active">
+				<a href="#cadastro" aria-controls="cadastro" role="tab" data-toggle="tab">cadastro</a>
+			</li>
+			<li role="presentation">
+				<a href="#tab" aria-controls="tab" role="tab" data-toggle="tab">sorteio</a>
+			</li>
+		</ul>
+
+		<!-- Tab panes -->
+		<div class="tab-content">
+			<div role="tabpanel" class="tab-pane active" id="cadastro">
+				<div class="well">
+					<div class="row">
+						<div class="col-sm-6 col-sm-offset-3">
+							<h1 class="text-center"> Cadastro - Sorteio de cestas básicas</h1>	
+							<div class="form-horizontal">
+								<div class="form-group">
+									<label for=""> Nome: </label>
+									<input type="text" id="nome" class="input-sm form-control" onblur="findPerson(this.value)">	
+									<small id="notification-nome" class="label-dander" style="display: none;">Há um cadastro com esse nome</small>
+								</div>
+								<div class="form-group">
+									<label for=""> Endereco: </label>
+									<input type="text" id="end" class="input-sm form-control">
+								</div>
+								<div class="form-group">
+									<label for=""> N da casa: </label>
+									<input type="text" id="n_casa" class="input-sm form-control">
+								</div>
+								<div class="form-group">
+									<label for="">Área atendida</label>
+									<select name="" id="setor" class="input-sm form-control">
+										<option value="optometrista">Optometrista</option>
+										<option value="corte_de_cabelo">Corte de cabelo</option>
+										<option value="enfermagem">Enfermagem</option>
+										<option value="fisioterapia">Fisioterapia</option>
+										<option value="infantil">Infantil</option>
+										<option value="sorridentes">Sorridentes</option>
+									</select>
+								</div>
+								<div class="form-group">
+									<button id="bt">GRAVAR</button>
+								</div>
+							</div>
+						</div>	
+					</div>
+				</div>
+				
+			</div>
+			<div role="tabpanel" class="tab-pane" id="tab">
+				<div class="well">
+					<div class="sorteado">
+						<div class="sorteado-info">
+							<h1 id="sorteado_nome"></h1>
+							<h2 id="sorteado_end"></h2>
+						</div>
+						<button id="sortear">Sortear</button>
+					</div>
+				</div>			
+			</div>
+		</div>
+	</div>
+	
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+	<script>
+		var bt = $('#bt'),	
+		bt_sortear = $('#sortear'),
+		candidatos = [],
+		sorteados = [],
+		sorteado_nome = $('#sorteado_nome'),
+		sorteado_end = $('#sorteado_end');
+
+		bt.click(function(e){
+			var nome = $('#nome'),
+					end = $('#end'),
+					n_casa = $('#n_casa'),
+					setor = $('#setor');
+
+			candidatos.push({
+				nome: nome.val(), 
+				endereco: end.val(), 
+				n_casa: n_casa.val(),
+				setor: setor.val(),
+				sorteado: false
+			});
+
+			nome.val('');
+			end.val('');
+			n_casa.val('');
+			setor.val('');
+		});
+
+
+
+		bt_sortear.click(function(e) {
+			sortear();
+		});
+
+
+		function sortear() {
+			var random = Math.floor(Math.random() * candidatos.length);
+			var sorteado = candidatos[random];
+
+			if (!sorteado) {
+				console.log('Não há mais nomes para serem sorteados');
+
+			}else if (sorteado.sorteado) {
+				sortear();
+			}
+
+			mostrarSorteado(sorteado);
+			gravaSorteado(sorteado);
+
+			candidatos.splice(0, random);
+		}
+
+
+		function gravaSorteado(sorteado) {
+			sorteado.sorteado = true;
+
+			console.log('gravando sorteado', sorteado);
+
+			sorteados.push(sorteado);
+
+			candidatos.forEach(function(v, k){
+				if (sorteado.endereco === v.endereco && sorteado.n_casa === v.n_casa) {
+					v.sorteado = true;
+					console.log('encontradas pessoas da mesma casa', v);
+					candidatos.splice(0, k);
+				}
+			});
+
+			$('#nome').focus();
+		}
+
+		// Pode ser usado no type para saber se já foi cadastro o nome;
+		// Pode ser usado para debug
+		function findPerson(nome) {
+			var pessoa = candidatos.filter(function(p){return p.nome == nome;})
+			if (pessoa.length) {
+				$('#notification-nome').show();
+				$('#nome').focus();
+			}else{
+				$('#notification-nome').hide();
+			}
+		}
+
+		function mostrarSorteado(sorteado) {
+			sorteado_nome.text(sorteado.nome);	
+			sorteado_end.text(sorteado.endereco);
+			sorteado_end.append(' '+ sorteado.n_casa);
+		}
+
+		
+	</script>
+
+</body>
+</html>
